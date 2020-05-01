@@ -1,32 +1,33 @@
 import pandas as pd
 import numpy as np
 
-class Preprocessor:
-    def preprocess_yow(self):
-        df = pd.read_csv('../datasets/yow_userstudy_raw.csv')
 
-        # remove NaN values
-        clds = df[df['classes']].notna()
+def preprocess_yow(path):
+    df = pd.read_csv(path)
 
-        # get 'people' topics
-        txds = clds[clds['classes'].str.contains("people")]
+    # remove NaN values
+    clds = df[df['classes'].notna()]
 
-        # select two most popular RSS IDs
-        top2_RSS_ID = txds.RSS_ID.value_counts().nlargest(2).to_dict()
+    # get 'people' topics
+    txds = clds[clds['classes'].str.contains("people")]
 
-        top1 = list(top2_RSS_ID.keys())[0]
-        top2 = list(top2_RSS_ID.keys())[1]
+    # select two most popular RSS IDs
+    top2_RSS_ID = txds.RSS_ID.value_counts().nlargest(2).to_dict()
 
-        top1_df = txds.loc[txds['RSS_ID'] == top1]
-        top2_df = txds.loc[txds['RSS_ID'] == top2]
+    top1 = list(top2_RSS_ID.keys())[0]
+    top2 = list(top2_RSS_ID.keys())[1]
 
-        final_df = pd.concat([top1_df, top2_df])
+    top1_df = txds.loc[txds['RSS_ID'] == top1]
+    top2_df = txds.loc[txds['RSS_ID'] == top2]
 
-        # normalize relevance to between 0 and 1, then add Gaussian noise,
-        final_df['relevant'] = (final_df['relevant'] / 5) + np.random.normal(0, 0.05, final_df['relevant'].count())
+    final_df = pd.concat([top1_df, top2_df])
 
-        # then clip
-        final_df.loc[final_df['relevant'] < 0] = 0
-        final_df.loc[final_df['relevant'] > 1] = 1
+    # normalize relevance to between 0 and 1, then add Gaussian noise,
+    final_df['relevant'] = (final_df['relevant'] / 5) + np.random.normal(0, 0.05, final_df['relevant'].count())
 
-        return final_df
+    # then clip
+    final_df.loc[final_df['relevant'] < 0] = 0
+    final_df.loc[final_df['relevant'] > 1] = 1
+
+    return final_df
+

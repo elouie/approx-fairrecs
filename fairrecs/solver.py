@@ -9,14 +9,14 @@ class Solver:
         objective = cp.Maximize(cp.matmul(cp.matmul(u, P), v))
         constraints = [cp.matmul(np.ones((1,len(u))), P) == np.ones((1,len(u))),
                        cp.matmul(P, np.ones((len(u),))) == np.ones((len(u),)),
-                       0 <= P, P <= 1,
-                       self.get_fair_constraint()
+                       0 <= P, P <= 1
                       ]
+        fair_constraint = self.get_fair_constraint()
+        if fair_constraint is not None:
+            constraints.append(fair_constraint)
         prob = cp.Problem(objective, constraints)
 
-        # The optimal objective value is returned by `prob.solve()`.
-        # result = prob.solve(verbose=True, max_iters=1000)
-        result = prob.solve(verbose=True, solver=cp.SCS)
+        result = prob.solve(verbose=False, solver=cp.SCS)
         return P.value
 
     def get_fair_constraint(self):
