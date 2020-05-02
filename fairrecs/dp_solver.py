@@ -19,6 +19,6 @@ class DPSolver(Solver):
     def get_fair_constraint(self):
         v = self.v
         P = self.P
-        f = self.G1 / np.sum(self.G1) - self.G2 / np.sum(self.G2)
-        fair_constraint = cp.matmul(cp.matmul(f.transpose(), P), v)
+        f = self.G1 / abs(np.sum(self.G1)) - self.G2 / abs(np.sum(self.G2))
+        fair_constraint = (cp.matmul(cp.matmul(f.transpose(), P), v) == 0)
         self.constraints.append(fair_constraint)
