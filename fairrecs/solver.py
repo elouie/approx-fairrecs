@@ -28,3 +28,10 @@ class Solver(object):
 
     def get_fair_constraint(self):
         return
+
+    def expected_utility(self):
+        u = self.u
+        v = self.v
+        P = self.P
+
+        return cp.matmul(cp.matmul(u, P.value), v)
