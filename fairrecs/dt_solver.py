@@ -4,8 +4,9 @@ import cvxpy as cp
 
 
 class DTSolver(Solver):
-    def __init__(self, u, g):
+    def __init__(self, u, g,  alpha=None):
         super().__init__(u)
+        self.alpha = alpha
 
         # Create indicator vectors for the two groups
         uniq_ids = np.unique(g)
@@ -28,6 +29,14 @@ class DTSolver(Solver):
         UG1 = np.sum(u[np.where(G1 == 1)])
         UG2 = np.sum(u[np.where(G2 == 1)])
 
+        # check f definition
         f = self.G1 / UG1 - self.G2 / UG2
-        fair_constraint = (cp.matmul(cp.matmul(f.transpose(), P), v) == 0)
-        self.constraints.append(fair_constraint)
+
+        if self.alpha is None:
+            fair_constraint = (cp.matmul(cp.matmul(f.transpose(), P), v) == 0)
+            self.constraints.append(fair_constraint)
+        else:
+            fair_constraint1 = (cp.matmul(cp.matmul(f.transpose(), P), v) <= self.alpha)
+            fair_constraint2 = (-self.alpha <= cp.matmul(cp.matmul(f.transpose(), P), v))
+            self.constraints.append(fair_constraint1)
+            self.constraints.append(fair_constraint2)
