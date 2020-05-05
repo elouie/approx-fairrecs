@@ -12,14 +12,16 @@ class Solver(object):
                        cp.matmul(self.P, self.I) == self.I,
                        0 <= self.P, self.P <= 1
                        ]
+        self.all_constraints = None
 
     def solve(self):
         u = self.u
         v = self.v
         P = self.P
-        constraints = self.constraints
         objective = cp.Maximize(cp.matmul(cp.matmul(u, P), v))
+        self.all_constraints = self.constraints.copy()
         self.get_fair_constraint()
+        constraints = self.all_constraints
 
         prob = cp.Problem(objective, constraints)
 
@@ -34,4 +36,4 @@ class Solver(object):
         v = self.v
         P = self.P
 
-        return cp.matmul(cp.matmul(u, P.value), v)
+        return np.dot(np.dot(u, P.value), v)
