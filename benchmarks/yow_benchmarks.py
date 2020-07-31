@@ -27,6 +27,7 @@ P_di = solver_di.solve()
 
 u = dataset['relevant'].to_numpy()
 v = np.array([1.0 / (np.log(2 + i)) for i, _ in enumerate(u)])
+v[range(10, len(v))] = 0
 
 print("Expected utility: ", solver.expected_utility())
 print("Demographic parity expected utility: ", solver_dp.expected_utility())
@@ -38,7 +39,7 @@ print("Disparate impact expected utility: ", solver_di.expected_utility())
 solver_dpa = DPSolver(dataset['relevant'].to_numpy(), dataset['RSS_ID'].to_numpy())
 solver_dta = DTSolver(dataset['relevant'].to_numpy(), dataset['RSS_ID'].to_numpy())
 solver_dia = DISolver(dataset['relevant'].to_numpy(), dataset['RSS_ID'].to_numpy())
-count = 6
+count = 100
 X = 1 - np.logspace(3,1,count)/2000
 Y = np.zeros([count, 3])
 C = np.zeros([count, 3])
@@ -65,6 +66,7 @@ plot(X, C[:,2], label="Disparate impact")
 plt.xlabel('Alpha (Percent disparity)')
 plt.ylabel('Cost of fairness')
 plt.legend()
+plt.savefig("ex1.png")
 plt.show()
 
 plt.figure(num=None, figsize=(8, 6), dpi=300)
@@ -75,4 +77,5 @@ plot(X, Y[:,2], label="Disparate impact")
 plt.xlabel('Alpha (Percent disparity)')
 plt.ylabel('Average utility')
 plt.legend()
+plt.savefig("ex2.png")
 plt.show()
